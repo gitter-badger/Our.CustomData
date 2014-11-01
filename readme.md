@@ -1,1 +1,2 @@
 ﻿Sample of creating an Umbraco 7 dashbord list view and edit view for custom data from sql.
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/joeriks/Our.CustomData?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
