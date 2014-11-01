@@ -1,0 +1,186 @@
+﻿<div class="umb-editor umb-listview" ng-controller="CustomData.Dashboard.OrdersListViewController">
+    <style>
+        canvas {
+            width: 100% !important;
+            max-width: 800px;
+            height: auto !important;
+        }
+    </style>
+
+    <div class="row-fluid">
+        <div class="umb-sub-header">
+
+            <div class="btn-group" ng-show="listViewAllowedTypes">
+                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                    <localize key="actions_create">Create</localize>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li ng-repeat="memberType in listViewAllowedTypes">
+                        <a href="#/{{entityType}}/{{entityType}}/edit/-1?doctype={{memberType.alias}}&create=true">
+                            <i class="icon {{memberType.icon}}" ng-class="getIcon(memberType)"></i>
+                            {{memberType.name}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="btn-group dropdown ng-scope">
+                <!-- primary button -->
+                <a class="btn btn-success" ng-click="filterMembers()" prevent-default>
+                    Filter
+                </a>
+                <a class="btn btn-success dropdown-toggle ng-scope" data-toggle="dropdown">
+                    <span class="caret"></span>
+                </a>
+
+                <!-- sub buttons -->
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                    <li>
+                        <a class="" ng-click="clearFilter()" prevent-default>
+                            Clear Filter
+                        </a>
+                    </li>
+                    <li ng-show="listViewResultSet.totalItems > 0">
+                        <a class="" ng-click="exportFiltered()" prevent-default>
+                            Export Members
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+
+            <div class="btn-group" ng-show="canUnlock()">
+                <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="unlock()" prevent-default>
+                    Unlock
+                </a>
+            </div>
+            <div class="btn-group" ng-show="canApprove()">
+                <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="approve()" prevent-default>
+                    Approve
+                </a>
+            </div>
+            <div class="btn-group" ng-show="canSuspend()">
+                <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="suspend()" prevent-default>
+                    Suspend
+                </a>
+            </div>
+            <div class="btn-group" ng-show="isAnythingSelected()">
+                <a class="btn btn-danger" ng-disabled="actionInProgress" ng-click="delete()" prevent-default>
+                    Delete
+                </a>
+            </div>
+
+            <span class="umb-status-label" ng-bind="bulkStatus" ng-show="isAnythingSelected()"></span>
+        </div>
+    </div>
+    <div class="row-fluid">
+
+        <div class="filter-display" ng-if="searchDisplay">
+            <div ng-repeat="displayFilter in searchDisplay">
+                <strong>{{displayFilter.title}}</strong>
+                <span>{{displayFilter.value}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div ng-if="listViewResultSet.totalItems > 0">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td style="width: 35px">
+                            <input type="checkbox" ng-click="selectAll($event)" ng-checked="isSelectedAll()">
+                        </td>
+                        <td>
+                            <a href="#" ng-click="sort('Id')" prevent-default>
+                                Id
+                                <i class="icon-sort"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="#" ng-click="sort('RegDate')" prevent-default>
+                                RegDate
+                                <i class="icon-sort"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="#" ng-click="sort('CustomerId')" prevent-default>
+                                CustomerId
+                                <i class="icon-sort"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="#" ng-click="sort('Status')" prevent-default>
+                                OrderStatus
+                                <i class="icon-sort"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <form class="pull-right" novalidate>
+                                <i class="icon-search"></i>
+                                <input type="text" ng-model="options.filter.filter" on-keyup="search()">
+                            </form>
+                        </td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="result in listViewResultSet.items"
+                        ng-class="{selected:result.selected}">
+
+                        <td>
+                            <i class="icon {{result.icon}}" ng-class="getIcon(result)"></i>
+                            <input type="checkbox" ng-model="result.selected">
+                        </td>
+                        <td>
+                            <a href="#" ng-click="edit(result.Id)" prevent-default>{{result.Id}}</a>
+                        </td>
+                        <td>
+                            {{result.RegDate | date:'yyyy-MM-dd'}}
+                        </td>
+                        <td>
+                            {{result.CustomerId}}
+                        </td>
+                        <td>
+                            {{result.Status}}
+                        </td>
+                    </tr>
+                </tbody>
+
+                <tfoot ng-show="pagination.length > 1">
+                    <tr>
+                        <th colspan="8">
+                            <div class="pull-left">
+                            </div>
+                            <div class="pagination pagination-right">
+                                <ul>
+                                    <li ng-class="{disabled:options.pageNumber <= 1}">
+                                        <a href="#" ng-click="prev()" prevent-default>
+                                            <localize key="general_previous">Previous</localize>
+                                        </a>
+                                    </li>
+
+                                    <li ng-repeat="pgn in pagination track by $index"
+                                        ng-class="{active:$index + 1 == options.pageNumber}">
+                                        <a href="#" ng-click="goToPage($index)" prevent-default>{{$index + 1}}</a>
+                                    </li>
+
+                                    <li ng-class="{disabled:options.pageNumber >= listViewResultSet.totalPages}">
+                                        <a href="#" ng-click="next()" prevent-default>
+                                            <localize key="general_next">Next</localize>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="no-results" ng-if="listViewResultSet.totalItems == 0">
+            No matching results
+        </div>
+    </div>
+
+

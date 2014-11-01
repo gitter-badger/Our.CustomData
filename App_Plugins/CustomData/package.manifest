@@ -1,0 +1,11 @@
+{
+	javascript: [
+		'~/App_Plugins/CustomData/resources/customData.resource.js',
+		'~/App_Plugins/CustomData/backoffice/dashboard/orders.controller.js',
+		'~/App_Plugins/CustomData/backoffice/dialogs/order/order.edit.controller.js',
+		'~/App_Plugins/CustomData/backoffice/dialogs/order/order.filter.controller.js'
+	],
+	css : [
+		'~/App_Plugins/CustomData/css/customDataListView.css'
+	]
+}

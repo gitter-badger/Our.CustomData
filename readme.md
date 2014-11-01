@@ -1,0 +1,1 @@
+﻿Sample of creating an Umbraco 7 dashbord list view and edit view for custom data from sql.
